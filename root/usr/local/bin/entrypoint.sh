@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -euo pipefail
+set -eu
 
 [ ! -r /data/.config ] && mkdir -p /data/.config
 [ ! -r /data/.images ] && mkdir -p /data/.images
@@ -13,6 +13,12 @@ if [ ! -r /data/icecast/web ] || [ ! -r /data/icecast/admin ] || [ ! -r /data/ic
     cp /defaults/silence.mp3 /data/icecast/web/silence.mp3
 fi
 
-chown -R mopidy:mopidy /data
-su-exec mopidy mopidy --config /data/.config/mopidy.conf local scan
+mv /etc/mopidy/mopidy.conf /etc/mopidy/mopidy.conf.orig
+cp /data/.config/mopidy.conf /etc/mopidy/mopidy.conf
+
+chown -R mopidy:audio /data
+
+# mopidyctl config
+mopidyctl local scan
+
 exec "${@}"
